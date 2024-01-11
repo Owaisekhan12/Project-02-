@@ -1,0 +1,94 @@
+#include <iostream>
+#include <iomanip>
+#include <vector>
+
+// Constants
+const int MAX_PASSENGERS = 80;
+const int TICKET_PRICE = 25;
+
+// Data structures
+struct TrainJourney {
+    int availableSeats;
+    int totalPassengers;
+    int totalRevenue;
+};
+
+std::vector<TrainJourney> upTrains(4);
+std::vector<TrainJourney> downTrains(4);
+
+// Function declarations
+void startOfDay();
+void purchaseTickets(int trainIndex, int numPassengers);
+void endOfDay();
+
+int main() {
+    startOfDay();
+    
+    // Example ticket purchases
+    purchaseTickets(0, 15);  // Purchase 15 tickets for the first up-train
+    purchaseTickets(2, 25);  // Purchase 25 tickets for the third up-train
+    purchaseTickets(1, 12);  // Purchase 12 tickets for the second up-train
+
+    endOfDay();
+
+    return 0;
+}
+
+void startOfDay() {
+    for (int i = 0; i < 4; ++i) {
+        upTrains[i].availableSeats = MAX_PASSENGERS;
+        downTrains[i].availableSeats = MAX_PASSENGERS;
+        upTrains[i].totalPassengers = 0;
+        downTrains[i].totalPassengers = 0;
+        upTrains[i].totalRevenue = 0;
+        downTrains[i].totalRevenue = 0;
+    }
+}
+
+void purchaseTickets(int trainIndex, int numPassengers) {
+    // Check if there are enough available seats
+    if (upTrains[trainIndex].availableSeats >= numPassengers) {
+        // Calculate total price
+        int totalPrice = numPassengers * TICKET_PRICE;
+
+        // Apply group discount if applicable
+        int freeTickets = numPassengers / 10;
+        totalPrice -= freeTickets * TICKET_PRICE;
+
+        // Update data
+        upTrains[trainIndex].availableSeats -= numPassengers;
+        upTrains[trainIndex].totalPassengers += numPassengers;
+        upTrains[trainIndex].totalRevenue += totalPrice;
+
+        // Display information
+        std::cout << "Tickets purchased for Up-Train " << trainIndex + 1 << ": "
+                  << numPassengers << " passengers, Total Price: $" << totalPrice << std::endl;
+    } else {
+        std::cout << "Error: Not enough available seats for Up-Train " << trainIndex + 1 << std::endl;
+    }
+}
+
+void endOfDay() {
+    int totalPassengers = 0;
+    int totalRevenue = 0;
+    int maxPassengers = 0;
+    int maxPassengersIndex = -1;
+
+    // Calculate totals and find train with the most passengers
+    for (int i = 0; i < 4; ++i) {
+        totalPassengers += upTrains[i].totalPassengers;
+        totalRevenue += upTrains[i].totalRevenue;
+
+        if (upTrains[i].totalPassengers > maxPassengers) {
+            maxPassengers = upTrains[i].totalPassengers;
+            maxPassengersIndex = i;
+        }
+    }
+
+    // Display end-of-day summary
+    std::cout << "\nEnd of the day summary:\n";
+    std::cout << "Total passengers: " << totalPassengers << "\n";
+    std::cout << "Total revenue: $" << totalRevenue << "\n";
+    std::cout << "Train with the most passengers: Up-Train " << maxPassengersIndex + 1
+              << " with " << maxPassengers << " passengers.\n";
+}
